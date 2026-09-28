@@ -1,21 +1,166 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "skill": {
     "name": "sample-skill",
     "description": "Minimal canonical Skill X-Ray example.",
     "source_path": "sample-skill",
     "generated_at": "2026-08-25T00:00:00Z",
-    "caster_version": "0.1"
+    "caster_version": "0.2"
   },
   "nodes": [
-    {"id": "W1", "type": "working_state", "title": "Prepare input", "summary": "Prepare the required input.", "details": "Prepare the documented input structure.", "inputs": ["Task"], "outputs": ["Prepared input"], "constraints": [], "terminal": false, "source_refs": [{"file": "SKILL.md", "line_start": 10, "line_end": 10}], "extraction_status": "explicit"},
-    {"id": "G1", "type": "gate_collection", "title": "Readiness", "summary": "Check that the input is complete.", "criteria": [{"id": "G1-C1", "text": "Input is complete", "required": true}], "required_evidence": ["Prepared input"], "source_refs": [{"file": "SKILL.md", "line_start": 11, "line_end": 11}], "extraction_status": "explicit"},
-    {"id": "W2", "type": "working_state", "title": "Deliver result", "summary": "Return the completed result.", "details": "Deliver the validated result.", "inputs": ["Prepared input"], "outputs": ["Result"], "constraints": [], "terminal": true, "source_refs": [{"file": "SKILL.md", "line_start": 12, "line_end": 12}], "extraction_status": "explicit"}
+    {
+      "id": "W1",
+      "type": "working_state",
+      "title": "Prepare input",
+      "summary": "Prepare the required input.",
+      "details": "Prepare the documented input structure.",
+      "inputs": [
+        "Task"
+      ],
+      "outputs": [
+        "Prepared input"
+      ],
+      "constraints": [],
+      "terminal": false,
+      "source_refs": [
+        {
+          "file": "SKILL.md",
+          "line_start": 10,
+          "line_end": 10
+        }
+      ],
+      "extraction_status": "explicit",
+      "case_step": {
+        "input": "A small task and its required inputs.",
+        "agent_action": "The agent prepares the documented input structure.",
+        "output": "A prepared input for the readiness check."
+      }
+    },
+    {
+      "id": "G1",
+      "type": "gate_collection",
+      "title": "Readiness",
+      "summary": "Check that the input is complete.",
+      "criteria": [
+        {
+          "id": "G1-C1",
+          "text": "Input is complete",
+          "required": true
+        }
+      ],
+      "required_evidence": [
+        "Prepared input"
+      ],
+      "source_refs": [
+        {
+          "file": "SKILL.md",
+          "line_start": 11,
+          "line_end": 11
+        }
+      ],
+      "extraction_status": "explicit",
+      "case_step": {
+        "input": "The prepared input from W1.",
+        "agent_action": "The agent checks whether the required parts are present.",
+        "judgment": "A missing part goes back for refinement; a complete input can be delivered.",
+        "tools_or_evidence": [
+          "The prepared input"
+        ],
+        "output": "A decision to refine or finish."
+      }
+    },
+    {
+      "id": "W2",
+      "type": "working_state",
+      "title": "Deliver result",
+      "summary": "Return the completed result.",
+      "details": "Deliver the validated result.",
+      "inputs": [
+        "Prepared input"
+      ],
+      "outputs": [
+        "Result"
+      ],
+      "constraints": [],
+      "terminal": true,
+      "source_refs": [
+        {
+          "file": "SKILL.md",
+          "line_start": 12,
+          "line_end": 12
+        }
+      ],
+      "extraction_status": "explicit",
+      "case_step": {
+        "input": "The complete prepared input.",
+        "agent_action": "The agent returns the validated result.",
+        "output": "The delivered result."
+      }
+    }
   ],
   "edges": [
-    {"id": "X1", "source": "W1", "target": "G1", "type": "flow", "condition": "Preparation completes", "summary": "Evaluate readiness.", "source_refs": [{"file": "SKILL.md", "line_start": 10, "line_end": 11}], "extraction_status": "explicit"},
-    {"id": "X2", "source": "G1", "target": "W1", "type": "gate_iterate", "condition": "Input is incomplete", "summary": "Refine the input.", "source_refs": [{"file": "SKILL.md", "line_start": 11, "line_end": 11}], "extraction_status": "explicit"},
-    {"id": "X3", "source": "G1", "target": "W2", "type": "gate_finish", "condition": "Input is complete", "summary": "Deliver the result.", "source_refs": [{"file": "SKILL.md", "line_start": 12, "line_end": 12}], "extraction_status": "explicit"}
+    {
+      "id": "X1",
+      "source": "W1",
+      "target": "G1",
+      "type": "flow",
+      "condition": "Preparation completes",
+      "summary": "Evaluate readiness.",
+      "source_refs": [
+        {
+          "file": "SKILL.md",
+          "line_start": 10,
+          "line_end": 11
+        }
+      ],
+      "extraction_status": "explicit"
+    },
+    {
+      "id": "X2",
+      "source": "G1",
+      "target": "W1",
+      "type": "gate_iterate",
+      "condition": "Input is incomplete",
+      "summary": "Refine the input.",
+      "source_refs": [
+        {
+          "file": "SKILL.md",
+          "line_start": 11,
+          "line_end": 11
+        }
+      ],
+      "extraction_status": "explicit"
+    },
+    {
+      "id": "X3",
+      "source": "G1",
+      "target": "W2",
+      "type": "gate_finish",
+      "condition": "Input is complete",
+      "summary": "Deliver the result.",
+      "source_refs": [
+        {
+          "file": "SKILL.md",
+          "line_start": 12,
+          "line_end": 12
+        }
+      ],
+      "extraction_status": "explicit"
+    }
   ],
-  "casting_notes": {"explicit_items": ["Preparation, readiness, and delivery"], "inferred_items": [], "ambiguities": [], "omissions": []}
+  "casting_notes": {
+    "explicit_items": [
+      "Preparation, readiness, and delivery"
+    ],
+    "inferred_items": [],
+    "ambiguities": [],
+    "omissions": []
+  },
+  "illustrative_case": {
+    "title": "Prepare and deliver one complete input",
+    "sample_input": "A requester provides a small task with the inputs needed to prepare a result.",
+    "assumptions": [
+      "The task is an illustrative input, not an executed run."
+    ]
+  }
 }

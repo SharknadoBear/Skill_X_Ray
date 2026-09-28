@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate Skill X-Ray 0.1 graph JSON using only the Python standard library."""
+"""Validate Skill X-Ray 0.1 and 0.2 graph JSON using only the standard library."""
 
 from __future__ import annotations
 
@@ -14,7 +14,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-SCHEMA_VERSION = "0.1"
+SCHEMA_VERSION = "0.2"
+SUPPORTED_SCHEMA_VERSIONS = {"0.1", "0.2"}
 NODE_PREFIX = {
     "working_state": "W",
     "tool": "T",
@@ -61,6 +62,32 @@ def _source_refs_valid(value: Any) -> bool:
     return True
 
 
+def _nonempty_text(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _validate_case_step(value: Any, node_id: str, node_type: str) -> list[dict[str, str]]:
+    if not isinstance(value, dict):
+        return [_problem("case_step", f"{node_id}.case_step must be an object", node_id)]
+    problems = []
+    allowed = {"input", "agent_action", "judgment", "tools_or_evidence", "output"}
+    if set(value) - allowed:
+        problems.append(_problem("case_step_field", f"{node_id}.case_step has unknown fields", node_id))
+    for key in ("input", "agent_action", "output"):
+        if not _nonempty_text(value.get(key)):
+            problems.append(_problem("case_step_field", f"{node_id}.case_step.{key} must be nonempty text", node_id))
+    if node_type == "gate_collection" and not _nonempty_text(value.get("judgment")):
+        problems.append(_problem("case_step_judgment", f"{node_id}.case_step.judgment is required for a gate", node_id))
+    elif "judgment" in value and not _nonempty_text(value["judgment"]):
+        problems.append(_problem("case_step_field", f"{node_id}.case_step.judgment must be nonempty text", node_id))
+    if "tools_or_evidence" in value and (
+        not _is_string_list(value["tools_or_evidence"])
+        or any(not item.strip() for item in value["tools_or_evidence"])
+    ):
+        problems.append(_problem("case_step_field", f"{node_id}.case_step.tools_or_evidence must be nonempty strings", node_id))
+    return problems
+
+
 def safe_xray_href(value: str) -> bool:
     """Allow HTTPS or a non-absolute, non-scheme relative URL."""
     if not value or any(ord(char) < 32 for char in value):
@@ -95,11 +122,30 @@ def validate_graph(graph: Any) -> dict[str, Any]:
             "semantic_fingerprint": None,
         }
 
+    version = graph.get("schema_version")
     required_top = {"schema_version", "skill", "nodes", "edges", "casting_notes"}
+    if version == "0.2":
+        required_top.add("illustrative_case")
     for key in sorted(required_top - set(graph)):
         errors.append(_problem("missing_top_level_field", f"Missing top-level field: {key}"))
-    if graph.get("schema_version") != SCHEMA_VERSION:
-        errors.append(_problem("schema_version", f"schema_version must be {SCHEMA_VERSION!r}"))
+    if version not in SUPPORTED_SCHEMA_VERSIONS:
+        errors.append(_problem("schema_version", f"schema_version must be one of {sorted(SUPPORTED_SCHEMA_VERSIONS)!r}"))
+    if version == "0.1" and "illustrative_case" in graph:
+        errors.append(_problem("illustrative_case_version", "illustrative_case requires schema 0.2"))
+    if version == "0.2":
+        case = graph.get("illustrative_case")
+        if not isinstance(case, dict):
+            errors.append(_problem("illustrative_case", "illustrative_case must be an object"))
+        else:
+            if set(case) - {"title", "sample_input", "assumptions"}:
+                errors.append(_problem("illustrative_case_field", "illustrative_case has unknown fields"))
+            for key in ("title", "sample_input"):
+                if not _nonempty_text(case.get(key)):
+                    errors.append(_problem("illustrative_case_field", f"illustrative_case.{key} must be nonempty text"))
+            if "assumptions" in case and (
+                not _is_string_list(case["assumptions"]) or any(not item.strip() for item in case["assumptions"])
+            ):
+                errors.append(_problem("illustrative_case_field", "illustrative_case.assumptions must be nonempty strings"))
 
     skill = graph.get("skill")
     if not isinstance(skill, dict):
@@ -108,8 +154,8 @@ def validate_graph(graph: Any) -> dict[str, Any]:
         for key in ("name", "description", "source_path", "generated_at", "caster_version"):
             if not isinstance(skill.get(key), str) or (key in {"name", "source_path"} and not skill.get(key)):
                 errors.append(_problem("skill_field", f"skill.{key} must be a valid string"))
-        if skill.get("caster_version") != SCHEMA_VERSION:
-            errors.append(_problem("caster_version", f"skill.caster_version must be {SCHEMA_VERSION!r}"))
+        if version in SUPPORTED_SCHEMA_VERSIONS and skill.get("caster_version") != version:
+            errors.append(_problem("caster_version", f"skill.caster_version must be {version!r}"))
 
     notes = graph.get("casting_notes")
     if not isinstance(notes, dict):
@@ -159,6 +205,14 @@ def validate_graph(graph: Any) -> dict[str, Any]:
             errors.append(_problem("missing_source_reference", f"{node_id} requires a source reference or inferred status", node_id))
         elif refs and any("line_start" not in ref for ref in refs):
             warnings.append(_problem("source_line_unavailable", f"A source line is unavailable for {node_id}", node_id))
+
+        if version == "0.2":
+            if node_type in {"working_state", "gate_collection", "skill_call"}:
+                errors.extend(_validate_case_step(node.get("case_step"), node_id, node_type))
+            elif "case_step" in node:
+                errors.append(_problem("case_step_type", f"{node_id} cannot have a case_step", node_id))
+        elif version == "0.1" and "case_step" in node:
+            errors.append(_problem("case_step_version", f"{node_id}.case_step requires schema 0.2", node_id))
 
         if node_type == "working_state":
             if not isinstance(node.get("details"), str):
@@ -345,7 +399,7 @@ def validate_graph(graph: Any) -> dict[str, Any]:
     counts = Counter(node.get("type", "invalid") for node in node_map.values())
     counts["edges"] = len([edge for edge in edges if isinstance(edge, dict)])
     result = {
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": version if version in SUPPORTED_SCHEMA_VERSIONS else SCHEMA_VERSION,
         "valid": not errors,
         "errors": errors,
         "warnings": warnings,

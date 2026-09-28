@@ -11,7 +11,7 @@
   <main id="xray-app" data-xray-ready="false">
     <aside id="left-sidebar" class="sidebar left" aria-label="Skill metadata and graph controls">
       <header>
-        <p class="eyebrow">Skill X-Ray 0.1</p>
+        <p class="eyebrow" id="xray-version">Skill X-Ray</p>
         <h1 id="skill-name">Loading graph</h1>
         <p id="skill-description" class="muted"></p>
         <dl class="metadata">
@@ -65,6 +65,17 @@
       <div id="inspector-content" aria-live="polite"></div>
     </aside>
   </main>
+  <dialog id="case-dialog" aria-labelledby="case-dialog-title" aria-describedby="case-dialog-note">
+    <div class="case-dialog-header">
+      <div>
+        <p class="eyebrow">Illustrative example</p>
+        <h2 id="case-dialog-title"></h2>
+      </div>
+      <button id="case-dialog-close" type="button">Close</button>
+    </div>
+    <p id="case-dialog-note" class="muted">A sample walkthrough of the documented workflow. It is not an execution record.</p>
+    <div id="case-dialog-content"></div>
+  </dialog>
   <pre id="xray-selftest" hidden></pre>
   <script id="xray-data" type="application/octet-stream">{{GRAPH_BASE64}}</script>
   <script>{{CYTOSCAPE}}</script>

@@ -55,7 +55,11 @@
     let layoutMode = mainNodeCount >= 15 ? "RADIAL" : "LR";
     let pinnedId = null;
     let radialEnvelope = null;
+    const caseDialog = document.getElementById("case-dialog");
+    const caseClose = document.getElementById("case-dialog-close");
+    let caseTrigger = null;
 
+    document.getElementById("xray-version").textContent = "Skill X-Ray " + graph.schema_version;
     document.getElementById("skill-name").textContent = graph.skill.name;
     document.getElementById("skill-description").textContent = graph.skill.description;
     document.getElementById("generated-at").textContent = graph.skill.generated_at;
@@ -497,6 +501,32 @@
       if (current) current.scrollIntoView({ block: "nearest" });
     }
 
+    function showCase(record, trigger) {
+      if (!graph.illustrative_case || !record.case_step) return;
+      const shared = graph.illustrative_case;
+      const step = record.case_step;
+      const content = document.getElementById("case-dialog-content");
+      content.replaceChildren();
+      document.getElementById("case-dialog-title").textContent = record.id + " — " + record.title;
+      section(content, "Case", shared.title);
+      section(content, "Sample input", shared.sample_input);
+      section(content, "Assumptions", shared.assumptions, { forceList: true });
+      section(content, "Input at this step", step.input);
+      section(content, "What the agent does", step.agent_action);
+      section(content, "Judgment", step.judgment);
+      section(content, "Tools or evidence", step.tools_or_evidence, { forceList: true });
+      section(content, "Output for the next step", step.output);
+      caseTrigger = trigger;
+      caseDialog.showModal();
+      caseClose.focus();
+    }
+
+    caseClose.addEventListener("click", () => caseDialog.close());
+    caseDialog.addEventListener("close", () => {
+      if (caseTrigger && caseTrigger.isConnected) caseTrigger.focus();
+      caseTrigger = null;
+    });
+
     function renderInspector(element, preview) {
       const title = document.getElementById("inspector-title");
       const content = document.getElementById("inspector-content");
@@ -515,6 +545,14 @@
       section(content, "Summary", record.summary || "No summary stated");
       if (preview) return;
       if (isNode) {
+        if (MAIN_TYPES.has(record.type) && graph.illustrative_case && record.case_step) {
+          const button = make("button", "Example", "case-example-button");
+          button.type = "button";
+          button.setAttribute("aria-haspopup", "dialog");
+          button.setAttribute("aria-controls", "case-dialog");
+          button.addEventListener("click", () => showCase(record, button));
+          content.appendChild(button);
+        }
         if (record.type === "working_state") {
           section(content, "Detailed instructions", record.details);
           section(content, "Inputs", record.inputs, { forceList: true });
@@ -587,6 +625,7 @@
 
     function pin(element) {
       if (!element || element.empty()) return;
+      if (caseDialog.open) caseDialog.close();
       pinnedId = element.id();
       focusElement(element, true);
       renderInspector(element, false);
@@ -754,6 +793,19 @@
       const gate = cy.nodes("[type = 'gate_collection']").first();
       if (!working.empty() && !gate.empty()) check("working_state_gate_size_match", parseFloat(working.style("width")) === parseFloat(gate.style("width")) && parseFloat(working.style("height")) === parseFloat(gate.style("height")), working.style("width") + " x " + working.style("height") + " / gate " + gate.style("width") + " x " + gate.style("height"));
       if (!gate.empty()) check("gate_outcomes", gate.outgoers("edge").filter(edge => edge.data("type").startsWith("gate_") || edge.data("type") === "skill_invoke").length >= 1);
+      for (const type of ["working_state", "gate_collection", "skill_call"]) {
+        const candidate = cy.nodes("[type = '" + type + "']").first();
+        if (candidate.empty()) continue;
+        pin(candidate);
+        const button = document.querySelector("#inspector-content .case-example-button");
+        const shouldHaveCase = Boolean(graph.illustrative_case && nodesById.get(candidate.id()).case_step);
+        check("example_button_" + type, Boolean(button) === shouldHaveCase);
+        if (button) {
+          button.click();
+          check("example_dialog_" + type, caseDialog.open && document.getElementById("case-dialog-content").textContent.includes(graph.illustrative_case.sample_input));
+          caseDialog.close();
+        }
+      }
       check("unsafe_link_rejected", !safeHref("javascript:alert(1)"));
       check("relative_link_allowed", safeHref("../called/graph.html"));
       const csp = document.querySelector("meta[http-equiv='Content-Security-Policy']");

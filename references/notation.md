@@ -26,3 +26,7 @@ state and receives a light-pink fill plus a thicker border.
 
 Use compact IDs on the canvas. Titles, instructions, criteria, conditions,
 inputs, outputs, and source references belong in the inspector.
+
+In graph 0.2, W/G/S inspector entries also have an Example button for a shared
+illustrative case. That popup is descriptive metadata, not an E node or a new
+workflow edge.

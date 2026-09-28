@@ -101,6 +101,15 @@ input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .inspect-section code { overflow-wrap: anywhere; white-space: pre-wrap; }
 .status-chip { border: 1px solid var(--line); border-radius: 999px; display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; }
 .outcome-button { margin: 3px 0; text-align: left; width: 100%; }
+.case-example-button { background: var(--accent); color: var(--panel); display: block; margin: 12px 0 3px; }
+.case-example-button:hover, .case-example-button:focus-visible { color: var(--panel); box-shadow: 0 0 0 3px var(--accent-soft); }
+#case-dialog { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); color: var(--ink); max-height: min(84vh, 760px); max-width: min(620px, calc(100vw - 24px)); overflow: auto; padding: 20px 24px; width: 100%; }
+#case-dialog::backdrop { background: rgba(10, 22, 35, .65); }
+.case-dialog-header { align-items: flex-start; display: flex; gap: 18px; justify-content: space-between; }
+.case-dialog-header h2 { font-size: 21px; line-height: 1.25; margin: 5px 0 8px; overflow-wrap: anywhere; }
+#case-dialog-note { margin: 4px 0 16px; }
+#case-dialog-content { overflow-wrap: anywhere; }
+#case-dialog-content .inspect-section { margin-top: 11px; padding-top: 10px; }
 .called-skill-link { background: var(--accent); color: white; display: inline-block; border-radius: 7px; margin-top: 8px; padding: 8px 10px; text-decoration: none; }
 .called-skill-link:focus-visible { outline: 3px solid var(--focus); }
 .sr-only { clip: rect(0, 0, 0, 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
@@ -112,6 +121,11 @@ input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
   .sidebar.right { right: 0; transform: translateX(105%); }
   .sidebar.open { transform: translateX(0); }
   .mobile-toolbar { display: flex; }
+}
+
+@media (max-width: 600px) {
+  #case-dialog { max-height: calc(100vh - 20px); padding: 16px; }
+  .case-dialog-header { gap: 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,6 @@
 # Skill X-Ray
 
-Skill X-Ray casts an agent skill into validated JSON and a standalone interactive HTML workflow graph. The graph helps inspect documented states, gates, tools, examples, iterations, and explicit subskill calls. The source skill remains authoritative.
+Skill X-Ray casts an agent skill into validated JSON and a standalone interactive HTML workflow graph. The graph helps inspect documented states, gates, tools, examples, iterations, and explicit subskill calls. In graph version 0.2, an **Example** button explains one illustrative input at each working state, gate, and inter-skill call. The source skill remains authoritative.
 
 Start with [SKILL.md](SKILL.md) for the workflow and its boundaries. The repository also contains the schema and notation in `schemas/` and `references/`, the Python inventory, validation, and rendering scripts in `scripts/`, the standalone viewer assets in `assets/` and `templates/`, and example graphs in `examples/`.
 

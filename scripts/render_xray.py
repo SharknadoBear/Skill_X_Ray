@@ -105,7 +105,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--graph", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--standalone", action="store_true", help="Accepted explicitly; standalone is always the v0.1 output mode")
+    parser.add_argument("--standalone", action="store_true", help="Accepted explicitly; output is always standalone")
     args = parser.parse_args(argv)
     try:
         result = render_graph(args.graph, args.output)

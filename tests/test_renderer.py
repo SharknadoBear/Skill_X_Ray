@@ -27,6 +27,15 @@ class RendererTests(unittest.TestCase):
             self.assertTrue(result["standalone"])
             self.assertIn("Content-Security-Policy", document)
             self.assertIn("connect-src 'none'", document)
+            self.assertIn('id="case-dialog"', document)
+            self.assertIn('aria-labelledby="case-dialog-title"', document)
+            self.assertIn('aria-describedby="case-dialog-note"', document)
+            self.assertIn('aria-haspopup", "dialog"', document)
+            self.assertIn('check("example_dialog_" + type', document)
+            self.assertIn('caseDialog.addEventListener("close"', document)
+            self.assertIn('caseTrigger.focus()', document)
+            self.assertIn('caseClose.focus()', document)
+            self.assertIn('content.replaceChildren()', document)
             self.assertNotRegex(document, r'<(?:script|link|img)\b[^>]+(?:src|href)=["\']https?://')
             self.assertIn('data-xray-ready="false"', document)
             self.assertIn('"width": 26', document)
@@ -50,6 +59,8 @@ class RendererTests(unittest.TestCase):
         graph = json.loads((ROOT / "examples" / "simple-skill-xray.json").read_text(encoding="utf-8"))
         graph = copy.deepcopy(graph)
         graph["skill"]["name"] = "</script><script>alert(1)</script>"
+        graph["illustrative_case"]["sample_input"] = "</script><script>alert(2)</script>"
+        graph["nodes"][0]["case_step"]["input"] = "<img src=x onerror=alert(3)>"
         with tempfile.TemporaryDirectory() as temporary:
             source = Path(temporary) / "graph.json"
             output = Path(temporary) / "graph.html"
@@ -57,7 +68,22 @@ class RendererTests(unittest.TestCase):
             render_graph(source, output)
             document = output.read_text(encoding="utf-8")
             self.assertNotIn("<script>alert(1)</script>", document)
+            self.assertNotIn("<script>alert(2)</script>", document)
+            self.assertNotIn("<img src=x onerror=alert(3)>", document)
             self.assertIn("&lt;/script&gt;", document)
+
+    def test_legacy_graph_renders_without_case_data(self) -> None:
+        graph = json.loads((ROOT / "examples" / "simple-skill-xray.json").read_text(encoding="utf-8"))
+        graph["schema_version"] = "0.1"
+        graph["skill"]["caster_version"] = "0.1"
+        del graph["illustrative_case"]
+        for node in graph["nodes"]:
+            node.pop("case_step", None)
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary) / "legacy.json"
+            output = Path(temporary) / "legacy.html"
+            source.write_text(json.dumps(graph), encoding="utf-8")
+            self.assertTrue(render_graph(source, output)["standalone"])
 
 
 if __name__ == "__main__":

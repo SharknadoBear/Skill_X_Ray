@@ -41,6 +41,21 @@ same graph lineage.
 Record inferences, ambiguities, and omissions in `casting_notes`. Never invent
 a tool, example, gate, or subskill call to make a graph visually complete.
 
+## Illustrative case (graph 0.2)
+
+Choose one concrete sample input for the whole graph. Prefer values shown in
+the target's request contract; otherwise choose plausible values and list the
+assumptions in `illustrative_case`. Use the same case in every W, G, and S
+`case_step`, including branches expressed as “if” outcomes. Describe the
+input, agent action, evidence or tool where relevant, judgment at gates, and
+output handed to the next step. Keep each field to one short plain-language
+sentence when practical. Do not claim a download, test, or subskill call
+happened unless it actually did; this case only explains the documented flow.
+
+An illustrative `case_step` is metadata for a W, G, or S node. It is not an
+E node and does not alter `extraction_status` or graph topology. E nodes
+remain reserved for source-provided examples of named tools.
+
 ## Source references
 
 Use paths relative to the target skill when possible. Include a heading and

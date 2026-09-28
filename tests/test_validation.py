@@ -26,6 +26,36 @@ class ValidationTests(unittest.TestCase):
             report = validate_graph(load(name))
             self.assertTrue(report["valid"], report["errors"])
 
+    def test_legacy_graph_still_passes(self) -> None:
+        graph = load()
+        graph["schema_version"] = "0.1"
+        graph["skill"]["caster_version"] = "0.1"
+        del graph["illustrative_case"]
+        for node in graph["nodes"]:
+            node.pop("case_step", None)
+        self.assertTrue(validate_graph(graph)["valid"])
+
+    def test_v02_requires_case_and_steps(self) -> None:
+        graph = load()
+        del graph["illustrative_case"]
+        self.assertIn("illustrative_case", codes(validate_graph(graph)))
+        graph = load()
+        del graph["nodes"][0]["case_step"]
+        self.assertIn("case_step", codes(validate_graph(graph)))
+        graph = load()
+        gate = next(node for node in graph["nodes"] if node["type"] == "gate_collection")
+        del gate["case_step"]["judgment"]
+        self.assertIn("case_step_judgment", codes(validate_graph(graph)))
+
+    def test_case_step_rejects_empty_and_wrong_node_type(self) -> None:
+        graph = load()
+        graph["nodes"][0]["case_step"]["agent_action"] = "  "
+        self.assertIn("case_step_field", codes(validate_graph(graph)))
+        graph = load()
+        tool = next(node for node in graph["nodes"] if node["type"] == "tool")
+        tool["case_step"] = {"input": "x", "agent_action": "y", "output": "z"}
+        self.assertIn("case_step_type", codes(validate_graph(graph)))
+
     def test_duplicate_node_ids_fail(self) -> None:
         graph = load()
         graph["nodes"].append(copy.deepcopy(graph["nodes"][0]))

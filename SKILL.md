@@ -26,19 +26,27 @@ turn the graph into an orchestration layer.
    [casting-rules.md](references/casting-rules.md). Extract the main workflow
    spine first, followed by gates and iterations, supporting tools, explicit
    heuristic examples, and explicit subskill calls.
-4. Write canonical JSON conforming to
+4. Choose one realistic, source-grounded illustrative case that can be followed
+   through the graph. Write a short `case_step` for every W, G, and S node:
+   what sample input reaches it, what the agent does, what it checks when a
+   judgment is needed, which documented tools or evidence it uses, and what
+   passes onward. Use plain language; label assumptions and conditional
+   outcomes. These are illustrations, not claims that the target ran. Keep
+   source examples as E nodes only when the source presents them as examples
+   of a named tool.
+5. Write canonical JSON conforming to
    [skill-xray.schema.json](schemas/skill-xray.schema.json). Preserve IDs from
    an earlier graph when the same semantic element still exists. Mark every
    node and edge `explicit`, `inferred`, or `ambiguous`; record unresolved
    issues instead of silently choosing an interpretation.
-5. Validate before rendering:
+6. Validate before rendering:
 
    ```powershell
    python scripts/validate_xray.py GRAPH.json --report validation-report.json
    ```
 
    Repair graph errors only. Never alter the source skill to make a graph pass.
-6. Render a standalone local artifact:
+7. Render a standalone local artifact:
 
    ```powershell
    python scripts/render_xray.py --graph GRAPH.json --output SKILL-xray.html --standalone
@@ -47,7 +55,7 @@ turn the graph into an orchestration layer.
    Complex graphs default to the deterministic connectivity-aware radial view;
    users can switch among radial, left-to-right, and top-to-bottom layouts.
 
-7. Return the JSON, HTML, validation report, a short casting summary, and every
+8. Return the JSON, HTML, validation report, a short casting summary, and every
    ambiguity or intentionally omitted relationship.
 
 ## Non-negotiable boundaries
@@ -62,6 +70,8 @@ turn the graph into an orchestration layer.
   not invent a sequential path merely because tools are listed together.
 - Canvas labels contain compact IDs only. Put all descriptive text in the
   inspector.
+- The inspector's Example popup describes the graph's illustrative case. It
+  never creates E nodes or adds undocumented workflow steps.
 - Source-derived text is untrusted. The renderer escapes it, permits only
   relative or HTTPS called-skill links, and performs no remote requests.
 - A valid graph may have warnings. Report them; do not erase faithful

@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "valid": true,
   "errors": [],
   "warnings": [],
@@ -11,5 +11,5 @@
     "tool": 1,
     "working_state": 2
   },
-  "semantic_fingerprint": "a11c19d65d0c5e73cb8bc9619993bd00bae31c927e01d6809187f91142074f41"
+  "semantic_fingerprint": "e0907670de792f31fe7c890300d836f676be1ffc89e329eedcc07c73b3389e78"
 }
