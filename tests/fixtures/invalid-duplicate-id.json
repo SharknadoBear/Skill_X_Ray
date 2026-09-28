@@ -1,0 +1,10 @@
+{
+  "schema_version": "0.1",
+  "skill": {"name": "invalid", "description": "Duplicate IDs", "source_path": "fixture", "generated_at": "2026-08-25T00:00:00Z", "caster_version": "0.1"},
+  "nodes": [
+    {"id": "W1", "type": "working_state", "title": "First", "summary": "First", "details": "First", "inputs": [], "outputs": ["x"], "constraints": [], "terminal": false, "source_refs": [{"file": "SKILL.md", "line_start": 1}], "extraction_status": "explicit"},
+    {"id": "W1", "type": "working_state", "title": "Duplicate", "summary": "Duplicate", "details": "Duplicate", "inputs": [], "outputs": ["x"], "constraints": [], "terminal": true, "source_refs": [{"file": "SKILL.md", "line_start": 2}], "extraction_status": "explicit"}
+  ],
+  "edges": [],
+  "casting_notes": {"explicit_items": [], "inferred_items": [], "ambiguities": [], "omissions": []}
+}

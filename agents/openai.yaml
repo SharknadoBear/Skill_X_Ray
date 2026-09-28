@@ -1,0 +1,6 @@
+interface:
+  display_name: "Skill X-Ray"
+  short_description: "Cast agent skills into interactive workflow graphs"
+  default_prompt: "Use $skill-xray to inspect a skill directory and produce validated JSON plus a standalone interactive workflow graph."
+policy:
+  allow_implicit_invocation: true

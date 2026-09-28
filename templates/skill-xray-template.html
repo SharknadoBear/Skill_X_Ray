@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; font-src data:">
+  <title>{{TITLE}}</title>
+  <style>{{CSS}}</style>
+</head>
+<body>
+  <main id="xray-app" data-xray-ready="false">
+    <aside id="left-sidebar" class="sidebar left" aria-label="Skill metadata and graph controls">
+      <header>
+        <p class="eyebrow">Skill X-Ray 0.1</p>
+        <h1 id="skill-name">Loading graph</h1>
+        <p id="skill-description" class="muted"></p>
+        <dl class="metadata">
+          <dt>Generated</dt><dd id="generated-at"></dd>
+          <dt>Source</dt><dd id="source-path"></dd>
+        </dl>
+      </header>
+      <section aria-labelledby="controls-title">
+        <h2 id="controls-title">Controls</h2>
+        <div class="button-grid">
+          <button id="fit-button" type="button">Fit graph</button>
+          <button id="reset-button" type="button">Reset focus</button>
+          <button id="direction-button" type="button">Layout: LR</button>
+          <button id="theme-button" type="button">Dark theme</button>
+        </div>
+      </section>
+      <section aria-labelledby="search-title">
+        <h2 id="search-title">Search</h2>
+        <label class="sr-only" for="search-input">Search graph nodes</label>
+        <input id="search-input" type="search" placeholder="ID, title, tool, criterion…" autocomplete="off">
+        <div id="search-results" class="search-results" role="listbox" aria-label="Search results"></div>
+      </section>
+      <section aria-labelledby="filter-title">
+        <h2 id="filter-title">Node filters</h2>
+        <div id="node-filters" class="filter-list"></div>
+      </section>
+      <section aria-labelledby="legend-title">
+        <h2 id="legend-title">Legend</h2>
+        <div id="legend" class="legend"></div>
+      </section>
+      <section aria-labelledby="index-title" class="index-section">
+        <h2 id="index-title">Node index</h2>
+        <nav id="node-index" aria-label="Graph node index"></nav>
+      </section>
+    </aside>
+
+    <section id="canvas-panel" aria-label="Interactive workflow graph">
+      <div class="mobile-toolbar">
+        <button id="toggle-left" type="button" aria-controls="left-sidebar">Controls</button>
+        <button id="toggle-right" type="button" aria-controls="right-sidebar">Inspector</button>
+      </div>
+      <div id="graph-canvas" role="application" aria-label="Skill workflow graph. Use the node index for keyboard navigation."></div>
+      <div id="condition-badge" aria-live="polite"></div>
+    </section>
+
+    <aside id="right-sidebar" class="sidebar right" aria-label="Graph inspector">
+      <header>
+        <p class="eyebrow">Inspector</p>
+        <h2 id="inspector-title">Select a node or edge</h2>
+      </header>
+      <div id="inspector-content" aria-live="polite"></div>
+    </aside>
+  </main>
+  <pre id="xray-selftest" hidden></pre>
+  <script id="xray-data" type="application/octet-stream">{{GRAPH_BASE64}}</script>
+  <script>{{CYTOSCAPE}}</script>
+  <script>{{DAGRE}}</script>
+  <script>{{CYTOSCAPE_DAGRE}}</script>
+  <script>{{APP_JS}}</script>
+</body>
+</html>

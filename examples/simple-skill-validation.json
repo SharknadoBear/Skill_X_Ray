@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1",
+  "valid": true,
+  "errors": [],
+  "warnings": [
+    {
+      "code": "single_criterion_gate",
+      "message": "G1 contains one criterion",
+      "element_id": "G1"
+    }
+  ],
+  "counts": {
+    "edges": 5,
+    "example": 1,
+    "gate_collection": 1,
+    "tool": 1,
+    "working_state": 2
+  },
+  "semantic_fingerprint": "d641987fc24f9e7a0de3067d35e76d220e2a695d9342ac6ffe82c307f2d0e181"
+}

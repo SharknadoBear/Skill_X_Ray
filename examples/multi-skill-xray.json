@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "skill": {
+    "name": "parent-preparation",
+    "description": "Prepare an input specification and invoke a named subskill.",
+    "source_path": "examples/multi-skill",
+    "generated_at": "2026-08-25T00:00:00Z",
+    "caster_version": "0.1"
+  },
+  "nodes": [
+    {"id": "W1", "type": "working_state", "title": "Draft input specification", "summary": "Inspect the request and draft its input specification.", "details": "Use the named request-inspection helper, then define required inputs and formats.", "inputs": ["User request"], "outputs": ["Input specification"], "constraints": [], "terminal": false, "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 10, "line_end": 10}], "extraction_status": "explicit"},
+    {"id": "G1", "type": "gate_collection", "title": "Specification readiness", "summary": "Check required inputs and formats.", "criteria": [{"id": "G1-C1", "text": "Every required input is defined", "required": true}, {"id": "G1-C2", "text": "Every expected format is defined", "required": true}], "required_evidence": ["Input specification"], "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 11, "line_end": 11}], "extraction_status": "explicit"},
+    {"id": "S1", "type": "skill_call", "title": "Invoke called preprocessor", "summary": "Delegate package preparation to the named subskill.", "target_skill": "called-preprocessor", "target_skill_path": "called-skill", "target_xray_href": "called-skill/called-skill-xray.html", "passed_inputs": ["Complete input specification"], "expected_outputs": ["Prepared package", "Provenance"], "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 12, "line_end": 13}], "extraction_status": "explicit"},
+    {"id": "W2", "type": "working_state", "title": "Deliver prepared package", "summary": "Return the package and provenance.", "details": "Deliver the returned package with its provenance.", "inputs": ["Prepared package", "Provenance"], "outputs": ["Final package"], "constraints": [], "terminal": true, "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 13, "line_end": 13}], "extraction_status": "explicit"},
+    {"id": "T1", "type": "tool", "title": "Inspect request", "summary": "Inventory request fields.", "tool_name": "inspect_request.py", "tool_category": "script", "script_path": "scripts/inspect_request.py", "call_pattern": "python scripts/inspect_request.py REQUEST", "inputs": ["Request"], "outputs": ["Request inventory"], "preconditions": ["Request path supplied"], "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 10, "line_end": 10}], "extraction_status": "explicit"},
+    {"id": "E1", "type": "example", "title": "Missing CRS example", "summary": "A missing coordinate system returns the specification for revision.", "example_text": "A request without a coordinate reference system is reported by inspect_request.py and returned for revision.", "demonstrates": "How a tool finding drives gate iteration", "target_tool_id": "T1", "source_refs": [{"file": "SKILL.md", "line_start": 15, "line_end": 16}], "extraction_status": "explicit"}
+  ],
+  "edges": [
+    {"id": "X1", "source": "E1", "target": "T1", "type": "example_guidance", "condition": "", "summary": "The example guides request inspection.", "source_refs": [{"file": "SKILL.md", "line_start": 15, "line_end": 16}], "extraction_status": "explicit"},
+    {"id": "X2", "source": "T1", "target": "W1", "type": "tool_support", "condition": "", "summary": "Request inspection supports specification drafting.", "source_refs": [{"file": "SKILL.md", "line_start": 10, "line_end": 10}], "extraction_status": "explicit"},
+    {"id": "X3", "source": "W1", "target": "G1", "type": "flow", "condition": "Draft complete", "summary": "Evaluate specification readiness.", "source_refs": [{"file": "SKILL.md", "line_start": 10, "line_end": 11}], "extraction_status": "explicit"},
+    {"id": "X4", "source": "G1", "target": "W1", "type": "gate_iterate", "condition": "A required input or format is missing", "summary": "Revise the specification.", "source_refs": [{"file": "SKILL.md", "line_start": 11, "line_end": 11}], "extraction_status": "explicit"},
+    {"id": "X5", "source": "G1", "target": "S1", "type": "skill_invoke", "condition": "The specification is complete", "summary": "Invoke the called preprocessor.", "source_refs": [{"file": "SKILL.md", "line_start": 12, "line_end": 12}], "extraction_status": "explicit"},
+    {"id": "X6", "source": "S1", "target": "W2", "type": "skill_return", "condition": "The prepared package and provenance return", "summary": "Continue to final delivery.", "source_refs": [{"file": "SKILL.md", "line_start": 13, "line_end": 13}], "extraction_status": "explicit"}
+  ],
+  "casting_notes": {
+    "explicit_items": ["Named request tool", "Two-criterion readiness gate", "Explicit called skill"],
+    "inferred_items": [],
+    "ambiguities": [],
+    "omissions": []
+  }
+}

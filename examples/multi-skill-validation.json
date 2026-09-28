@@ -1,0 +1,15 @@
+{
+  "schema_version": "0.1",
+  "valid": true,
+  "errors": [],
+  "warnings": [],
+  "counts": {
+    "edges": 6,
+    "example": 1,
+    "gate_collection": 1,
+    "skill_call": 1,
+    "tool": 1,
+    "working_state": 2
+  },
+  "semantic_fingerprint": "a11c19d65d0c5e73cb8bc9619993bd00bae31c927e01d6809187f91142074f41"
+}

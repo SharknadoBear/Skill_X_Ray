@@ -1,0 +1,87 @@
+{
+  "schema_version": "0.1",
+  "skill": {
+    "name": "simple-input-check",
+    "description": "Inspect a small input package and report whether it is ready.",
+    "source_path": "examples/simple-skill",
+    "generated_at": "2026-08-25T00:00:00Z",
+    "caster_version": "0.1"
+  },
+  "nodes": [
+    {
+      "id": "W1",
+      "type": "working_state",
+      "title": "Inspect input package",
+      "summary": "Inventory the requested input package.",
+      "details": "Run the named inspection helper and interpret its inventory.",
+      "inputs": ["Input package"],
+      "outputs": ["Input inventory"],
+      "constraints": ["Do not execute unrelated files"],
+      "terminal": false,
+      "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 10, "line_end": 10}],
+      "extraction_status": "explicit"
+    },
+    {
+      "id": "G1",
+      "type": "gate_collection",
+      "title": "Input readiness",
+      "summary": "Determine whether all required inputs are present.",
+      "criteria": [{"id": "G1-C1", "text": "All required files are present", "required": true}],
+      "required_evidence": ["Input inventory"],
+      "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 11, "line_end": 12}],
+      "extraction_status": "explicit"
+    },
+    {
+      "id": "W2",
+      "type": "working_state",
+      "title": "Deliver inventory",
+      "summary": "Return the completed inventory.",
+      "details": "Deliver the inventory when the readiness gate passes.",
+      "inputs": ["Passing input inventory"],
+      "outputs": ["Delivered inventory"],
+      "constraints": [],
+      "terminal": true,
+      "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 12, "line_end": 12}],
+      "extraction_status": "explicit"
+    },
+    {
+      "id": "T1",
+      "type": "tool",
+      "title": "Inspect input files",
+      "summary": "Run the named inventory helper.",
+      "tool_name": "inspect_input.py",
+      "tool_category": "script",
+      "script_path": "scripts/inspect_input.py",
+      "call_pattern": "python scripts/inspect_input.py INPUT",
+      "inputs": ["Input package"],
+      "outputs": ["Inventory"],
+      "preconditions": ["Input path supplied"],
+      "source_refs": [{"file": "SKILL.md", "heading": "Workflow", "line_start": 10, "line_end": 10}],
+      "extraction_status": "explicit"
+    },
+    {
+      "id": "E1",
+      "type": "example",
+      "title": "Missing forcing example",
+      "summary": "The helper reports a missing required forcing file.",
+      "example_text": "When forcing.nc is absent, the script reports it as missing and the workflow returns to input preparation.",
+      "demonstrates": "How inspection output triggers iteration",
+      "target_tool_id": "T1",
+      "source_refs": [{"file": "SKILL.md", "line_start": 14, "line_end": 15}],
+      "extraction_status": "explicit"
+    }
+  ],
+  "edges": [
+    {"id": "X1", "source": "E1", "target": "T1", "type": "example_guidance", "condition": "", "summary": "The example guides interpretation of the helper.", "source_refs": [{"file": "SKILL.md", "line_start": 14, "line_end": 15}], "extraction_status": "explicit"},
+    {"id": "X2", "source": "T1", "target": "W1", "type": "tool_support", "condition": "", "summary": "The helper supports package inspection.", "source_refs": [{"file": "SKILL.md", "line_start": 10, "line_end": 10}], "extraction_status": "explicit"},
+    {"id": "X3", "source": "W1", "target": "G1", "type": "flow", "condition": "Inventory produced", "summary": "Evaluate input readiness.", "source_refs": [{"file": "SKILL.md", "line_start": 10, "line_end": 11}], "extraction_status": "explicit"},
+    {"id": "X4", "source": "G1", "target": "W1", "type": "gate_iterate", "condition": "Required files are missing", "summary": "Repair and inspect again.", "source_refs": [{"file": "SKILL.md", "line_start": 11, "line_end": 11}], "extraction_status": "explicit"},
+    {"id": "X5", "source": "G1", "target": "W2", "type": "gate_finish", "condition": "All required files are present", "summary": "Deliver the completed inventory.", "source_refs": [{"file": "SKILL.md", "line_start": 12, "line_end": 12}], "extraction_status": "explicit"}
+  ],
+  "casting_notes": {
+    "explicit_items": ["Three-step workflow", "Named inspection script", "Missing-file retry example"],
+    "inferred_items": [],
+    "ambiguities": [],
+    "omissions": []
+  }
+}

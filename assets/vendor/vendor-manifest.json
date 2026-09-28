@@ -1,0 +1,29 @@
+{
+  "schema_version": "1",
+  "packages": [
+    {
+      "name": "cytoscape",
+      "version": "3.34.1",
+      "file": "cytoscape.min.js",
+      "sha256": "5141892eb19898946e5af8300e14cec15a63a22186a4ca56d76819a91e2a3fe6",
+      "license": "MIT",
+      "source": "https://cdn.jsdelivr.net/npm/cytoscape@3.34.1/dist/cytoscape.min.js"
+    },
+    {
+      "name": "dagre",
+      "version": "0.8.5",
+      "file": "dagre.min.js",
+      "sha256": "62eb9787ccfdbdf4148d4d99d31dbf9ee4770eafee81e637d759b52aac22cd51",
+      "license": "MIT",
+      "source": "https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"
+    },
+    {
+      "name": "cytoscape-dagre",
+      "version": "2.5.0",
+      "file": "cytoscape-dagre.js",
+      "sha256": "bf70fe402991dcbff33e05a7e4a5271c78020bb75e85d1c80ab7538e4157112e",
+      "license": "MIT",
+      "source": "https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.js"
+    }
+  ]
+}
